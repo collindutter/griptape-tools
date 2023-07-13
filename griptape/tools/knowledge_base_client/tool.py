@@ -5,6 +5,7 @@ from attr import define, field, Factory
 from griptape.artifacts import BaseArtifact, ErrorArtifact, TextArtifact
 from griptape.core import BaseTool
 from griptape.core.decorators import activity
+import traceback
 
 
 @define
@@ -55,10 +56,13 @@ class KnowledgeBaseClient(BaseTool):
     })
     def summarize(self, _: dict) -> BaseArtifact:
         try:
+            artifacts = self.load_artifacts(self.namespace)
+            print(artifacts)
             return self.summary_engine.summarize_artifacts(
-                self.load_artifacts(self.namespace)
+                artifacts
             )
         except Exception as e:
+            traceback.print_exc()
             return ErrorArtifact(f"error querying knowledge base: {e}")
 
     def load_artifacts(self, namespace: str) -> list[TextArtifact]:
